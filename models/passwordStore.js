@@ -29,6 +29,8 @@ PasswordStore.prototype.save = function(fn) {
 	}
 };
 
+// TODO: use User prototype methods and statics as basis
+// for the remaining PasswordStore methods
 User.prototype.update = function(fn) {
 	var user = this;
 	var id = user.id;
