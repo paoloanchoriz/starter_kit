@@ -1,15 +1,16 @@
 var User = require('../../models/authentication/user');
 var MongoUser = require('../../models/user');
 
+// TODO: Update router to use Mongo User as base schema
+// and use PasswordStore to store users pass, id and email
+// key value will be user:email { pass, id }
 var saveMongoUser = function(formUser, req, res, next) {
-	console.log(formUser);
 	var mongoDetails = {
 		_id : formUser.id,
 		userName : formUser.name,
 		firstName : formUser.firstName,
 		lastName : formUser.lastName,
 		birthDate : new Date(formUser.birthDate),
-		createDate : new Date(),
 		email : formUser.email,
 		contactNumber : formUser.contactNumber
 	};

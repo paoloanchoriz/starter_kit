@@ -1,6 +1,8 @@
 var User = require('../../models/authentication/user');
 var MongoUser = require('../../models/user');
 
+// TODO: update routers to use PasswordStore instead of redis User and
+// mongoose schema User instead of MongoUser
 exports.view = function(req, res) {
 	if(req.session.uid) { console.log('Redirecting');res.redirect('/'); }
 	res.render('login', { title : 'Login Page' });

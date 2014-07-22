@@ -2,13 +2,16 @@ var redis = require('redis');
 var bcrypt = require('bcrypt');
 var db = redis.createClient();
 
-function User(obj) {
-	for(var key in obj) {
-		this[key] = obj[key];
-	}
+// TODO: update password, update email,
+// authenticate by email and password
+// the key value will be user:email userspecs{ pass, id }
+function PasswordStore(specs) {
+	this.id = specs.id;
+	this.email = specs.email;
+	this.pass = specs.pass;
 }
 
-User.prototype.save = function(fn) {
+PasswordStore.prototype.save = function(fn) {
 	if(this.id) {
 		this.update(fn);
 	} else {
@@ -51,15 +54,6 @@ User.prototype.hashPassword = function(fn) {
 			user.pass = hash;
 			fn();
 		});
-	});
-};
-
-// Static Methods
-// Uses index to get the id. Index key composition is <collection>:<key>:<fieldValue> where field value is the one used for indexing
-User.getByName = function(name, fn) {
-	User.getId(name, function(err, id) {
-		if(err) return fn(err);
-		User.get(id, fn);
 	});
 };
 
