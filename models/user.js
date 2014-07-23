@@ -1,25 +1,21 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-mongoose.model('User', new Schema({
-		_id : Number,
-		nickName : String,
-		firstName : String,
-		lastName : String,
-		birthDate : Date,
-		createDate : { type: Date, default: Date.now },
-		email : String,
-		contactNumber : String,
-		isAdmin : { type: Boolean, default: false }
-	})
-);
-
-var User = mongoose.model('User', User);
+var User = new Schema({
+	firstName : String,
+	lastName : String,
+	displayName : String,
+	birthDate : Date,
+	createDate : { type: Date, default: Date.now },
+	email : String,
+	contactNumber : String,
+	isAdmin : { type: Boolean, default: false }
+});
 
 var find = function(searchObj, cb) {
 	var that = mongoose.model('User');
-	that.findOne(searchObj, function(name, err) {
-		cb(name, err);
+	that.findOne(searchObj, function(user, err) {
+		cb(user, err);
 	});
 };
 
@@ -28,9 +24,11 @@ User.statics.findByEmail = function(email, cb) {
 	find({ email : email }, cb);
 };
 
-// Find user 
+// Find user by Id (Quicker Access?)
 User.statics.findById = function(id, cb) {
-	find({ _id : id } );
+	find({ _id : id }, cb);
 };
 
-module.exports = User;
+// Search functions that uses first name, last name and display name?
+
+mongoose.model('User', User);

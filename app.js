@@ -21,20 +21,20 @@ app.set('view engine', 'ejs');
 
 // Favicon?
 app.use(favicon());
-//TODO: implement logging in the future
+//TODO[PAO]: implement logging in the future
 app.use(logger('dev'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 
-//TODO: Will use redis connect in future implementation
+//TODO[PAO]: Will use redis connect in future implementation
 app.use(session({ secret: 'joy lyn is a pig' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 routes.initRouters(app);
 
-//TODO: move system handling to another file
+//TODO[PAO]: move system handling to another file
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
     res.error('Not Found!');
@@ -65,6 +65,6 @@ app.use(function(err, req, res, next) {
     });
 });
 
-app.listen(8080, function() {
+app.listen(8888, function() {
     console.log('Now listening @ 8080')
 });

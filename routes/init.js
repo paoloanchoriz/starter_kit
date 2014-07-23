@@ -8,13 +8,13 @@ var users = require('./route-modules/users');
 // declare all routers and middlewares here
 module.exports.initRouters = function(app) {
 	// Attach user to session if uid exists
-	app.use(sessionHandler.userHandler);
+	//app.use(sessionHandler.userHandler);
 	// Add message utilities to response object
 	app.use(sessionHandler.messageHandler);
 
-	app.route('/login')
-		.get(authentication.view)
-		.post(authentication.submit);
+	//app.route('/login')
+	//	.get(authentication.view)
+	//	.post(authentication.submit);
 
 	app.route('/register')
 		.get(registration.view)
@@ -22,11 +22,11 @@ module.exports.initRouters = function(app) {
 
 	// middle ware to authenticate user
 	// above are not restricted pages
-	app.use(sessionHandler.authenticationHandler);
+	//app.use(sessionHandler.authenticationHandler);
 	// below are restricted pages
 
-	app.get('/:index(index)?', index.index);
+	//app.get('/:index(index)?', index.index);
 
-	app.get('/users', users);
-	app.get('/logout', authentication.logout);
+	//app.get('/users', users);
+	//app.get('/logout', authentication.logout);
 };
