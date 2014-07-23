@@ -31,7 +31,7 @@ PasswordStore.prototype.update = function(fn) {
 
 PasswordStore.getByEmail = function(email, fn) {
 	db.hgetall('user:' + email, function(err, user) {
-		fn(null, user);
+		fn(err, user);
 	});
 };
 // TODO[PAO]: Create update email function
