@@ -1,6 +1,6 @@
 // var User = require('../../models/authentication/user');
+var User = require('../../models/user');
 var PasswordStore = require('../../models/passwordStore');
-var User = require('mongoose').model('User');
 
 // TODO: Update router to use Mongo User as base schema
 // and use PasswordStore to store users pass, id and email
@@ -10,7 +10,8 @@ var saveUser = function(req, res, next) {
 		if(err) return next(err);
 
 		if(formUser) {
-			res.error('Username already taken!');
+			res.error('Email already in use.');
+			res.redirect('back');
 			return;
 		}
 
@@ -29,17 +30,18 @@ var saveUser = function(req, res, next) {
 			email : formUser.email,
 			contactNumber : formUser.contactNumber
 		}).save(function(err, user) {
+			if(err) return next(err);
+			
+
 			var passwordStore = new PasswordStore({
 				id : user._id,
 				pass : formUser.pass,
 				email : user.email
 			});
 			passwordStore.save(function(err) {
-				if(err) return next(err);
-				res.session.uid = user._id;
-				res.session.user = user;
-				// Redirect where?	
-				res.redirect('/register');
+				req.session.uid = user._id;
+				req.session.user = user;
+				res.redirect('/users');
 			});
 		});
 	};
@@ -52,5 +54,6 @@ exports.view = function(req, res) {
 
 exports.submit = function(req, res, next) {
 	// TODO[PAO]: validation goes here
+	// TODO[PAO]: move findByEmail to validation part
 	User.findByEmail(req.body.user.email, saveUser(req, res, next));
 };

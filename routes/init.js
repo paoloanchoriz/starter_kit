@@ -27,6 +27,6 @@ module.exports.initRouters = function(app) {
 
 	//app.get('/:index(index)?', index.index);
 
-	//app.get('/users', users);
+	app.get('/users', users);
 	//app.get('/logout', authentication.logout);
 };

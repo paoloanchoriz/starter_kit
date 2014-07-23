@@ -1,5 +1,5 @@
-var User = require('../../models/passwordStore');
-var User = require('mongoose').model('User');
+var PasswordStore = require('../../models/passwordStore');
+var User = require('../../models/user');
 
 // TODO[PAO]: update routers to use PasswordStore instead of redis User and
 // mongoose schema User instead of MongoUser

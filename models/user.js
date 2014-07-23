@@ -12,23 +12,22 @@ var User = new Schema({
 	isAdmin : { type: Boolean, default: false }
 });
 
-var find = function(searchObj, cb) {
-	var that = mongoose.model('User');
-	that.findOne(searchObj, function(user, err) {
+var find = function(that, searchObj, cb) {
+	that.findOne(searchObj, function(err, user) {
 		cb(user, err);
 	});
 };
 
 // This will be used for uniqueness
 User.statics.findByEmail = function(email, cb) {
-	find({ email : email }, cb);
+	find(this, { email: email }, cb);
 };
 
 // Find user by Id (Quicker Access?)
 User.statics.findById = function(id, cb) {
-	find({ _id : id }, cb);
+	find(this, { _id : id }, cb);
 };
 
 // Search functions that uses first name, last name and display name?
 
-mongoose.model('User', User);
+module.exports = mongoose.model('User', User);
