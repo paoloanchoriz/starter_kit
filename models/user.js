@@ -14,7 +14,7 @@ var User = new Schema({
 
 var find = function(that, searchObj, cb) {
 	that.findOne(searchObj, function(err, user) {
-		cb(user, err);
+		cb(err, user);
 	});
 };
 
@@ -23,11 +23,13 @@ User.statics.findByEmail = function(email, cb) {
 	find(this, { email: email }, cb);
 };
 
-// Find user by Id (Quicker Access?)
+// Find user by Id (Used for retrieving using other users)
 User.statics.findById = function(id, cb) {
 	find(this, { _id : id }, cb);
 };
 
-// Search functions that uses first name, last name and display name?
+// TODO[PAO]: Search functions that uses first name, 
+// last name and display name?
+// Future implementation
 
 module.exports = mongoose.model('User', User);

@@ -4,26 +4,33 @@ var User = require('../../models/user');
 // TODO[PAO]: update routers to use PasswordStore instead of redis User and
 // mongoose schema User instead of MongoUser
 exports.view = function(req, res) {
-	if(req.session.uid) { console.log('Redirecting');res.redirect('/'); }
+	if(req.session.uid) res.redirect('/');
 	res.render('login', { title : 'Login Page' });
 };
 
-// TODO[PAO]: update this to match the current implementation
 exports.submit = function(req, res, next) {
 	var user = req.body.user;
-	// User.authenticate(user.name, user.pass, function(err, user) {
-	// 	if(err) return next(err);
-	// 	if(user) {
-	// 		MongoUser.findOne({ _id: user.id }, function(err, mongoUser) {
-	// 			req.session.uid = mongoUser._id;
-	// 			req.session.user = mongoUser;
-	// 			next();
-	// 		});
-	// 	} else {
-	// 		res.error('Invalid Username or Password!');
-	// 		res.redirect('back');
-	// 	}
-	// });
+	PasswordStore.authenticate(user, function(err, result) {
+		if(err) return next(err);
+		if(!result) {
+			res.error('Invalid email or password');
+			res.redirect('back');
+			return;
+		}
+
+		User.findByEmail(user.email, function(err, user) {
+			if(err) return next(err);
+			if(!user) {
+				res.error('User does not exist in our records');
+				res.redirect('back');
+				return;
+			}
+			
+			req.session.uid = user._id;
+			req.session.user = user;
+			res.redirect('/');
+		});
+	});
 };
 
 exports.logout = function(req, res) {

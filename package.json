@@ -17,15 +17,14 @@
     "passport-twitter": "~1.0.2",
     "passport-google-oauth": "~0.1.5",
     "connect-flash": "~0.1.1",
-    "bcrypt": "0.7.8",
-    "bcrypt-nodejs": "latest",
+    "bcryptjs": "2.0.2",
 
     "morgan": "~1.0.0",
     "cookie-parser": "~1.0.1",
     "body-parser": "~1.0.0",
     "debug": "~0.7.4",
     "method-override": "2.1.1",
-    "express-session": "1.6.5",
+    "express-session": "1.7.0",
     "connect-redis": "2.0.0"
   }
 }

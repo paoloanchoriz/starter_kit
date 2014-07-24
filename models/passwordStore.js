@@ -1,24 +1,16 @@
 var redis = require('redis');
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 var db = redis.createClient();
 
-// TODO: update password, update email,
-// authenticate by email and password
-// the key value will be user:email userspecs{ pass, id, salt }
 function PasswordStore(specs) {
 	this.id = specs.id;
 	this.email = specs.email;
 	this.pass = specs.pass;
 }
 
-var hashPassword = function(password, salt) {
-	return bcrypt.hashSync(password, salt);
-};
-
 PasswordStore.prototype.save = function(fn) {
-	var salt = bcrypt.getSaltSync(12);
-	this.pass = hashPassword(this.pass, salt);
-	this.salt = salt;
+	var salt = bcrypt.genSaltSync(12);
+	this.pass = bcrypt.hashSync(this.pass, salt);
 	this.update(fn);
 };
 
@@ -30,32 +22,27 @@ PasswordStore.prototype.update = function(fn) {
 };
 
 PasswordStore.getByEmail = function(email, fn) {
-	db.hgetall('user:' + email, function(err, user) {
-		fn(err, user);
+	db.hgetall('user:' + email, function(err, passwordStore) {
+		fn(err, passwordStore);
 	});
 };
-// TODO[PAO]: Create update email function
+
+PasswordStore.authenticate = function(user, fn) {
+	this.getByEmail(user.email, function(err, passwordStore) {
+		console.log(passwordStore);
+		if(err) return fn(err);
+		if(!passwordStore) return fn();
+
+		bcrypt.compare(user.pass, passwordStore.pass, 
+			function(err, result) {
+				if(err) return fn(err);
+
+				return fn(err, result);
+			}
+		);
+	});
+};
 // TODO[PAO]: Create update password function
-// TODO[PAO]: Create static get by email
-// TODO[PAO]: Create static authenticate
+// TODO[PAO]: Create update email
 
-// User.authenticate = function(name, pass, fn) {
-// 	User.getByName(name, function(err, user) {
-// 		if(err) return fn(err);
-// 		if(!user.id) return fn();
-// 		bcrypt.hash(pass, user.salt, function(err, hash) {
-// 			if(err) return fn(err);
-// 			if(hash === user.pass) return fn(null, user);
-// 			fn();
-// 		});
-// 	});
-// };
-
-
-// User.get = function(id, fn) {
-// 	db.hgetall('user:' + id, function(err, user) {
-// 		if(err) return fn(err);
-// 		fn(null, new User(user));
-// 	});
-// };
 module.exports = PasswordStore;

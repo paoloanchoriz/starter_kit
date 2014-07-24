@@ -29,7 +29,13 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 
 //TODO[PAO]: Will use redis connect in future implementation
-app.use(session({ secret: 'joy lyn is a pig' }));
+app.use(session({ 
+        secret: 'joy lyn is a pig',
+        rolling: true,
+        resave: true,
+        saveUninitialized: true
+    })
+);
 app.use(express.static(path.join(__dirname, 'public')));
 
 routes.initRouters(app);

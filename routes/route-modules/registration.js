@@ -2,9 +2,6 @@
 var User = require('../../models/user');
 var PasswordStore = require('../../models/passwordStore');
 
-// TODO: Update router to use Mongo User as base schema
-// and use PasswordStore to store users pass, id and email
-// key value will be user:email { pass, id }
 var saveUser = function(req, res, next) {
 	return function(formUser, err) {
 		if(err) return next(err);
@@ -32,23 +29,23 @@ var saveUser = function(req, res, next) {
 		}).save(function(err, user) {
 			if(err) return next(err);
 			
-
 			var passwordStore = new PasswordStore({
 				id : user._id,
 				pass : formUser.pass,
 				email : user.email
 			});
+			
 			passwordStore.save(function(err) {
 				req.session.uid = user._id;
 				req.session.user = user;
-				res.redirect('/users');
+				res.redirect('/');
 			});
 		});
 	};
 };
 
 exports.view = function(req, res) {
-	//if(req.session.uid) res.redirect('/');
+	if(req.session.uid) res.redirect('/');
 	res.render('register', { title: 'Register' });
 };
 
