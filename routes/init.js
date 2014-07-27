@@ -4,6 +4,7 @@ var authentication = require('./route-modules/authentication');
 var registration = require('./route-modules/registration');
 var sessionHandler = require('../lib/sessionHandler');
 var users = require('./route-modules/users');
+var updateUser = require('./route-modules/updateUser');
 
 // declare all routers and middlewares here
 module.exports.initRouters = function(app) {
@@ -20,12 +21,17 @@ module.exports.initRouters = function(app) {
 
 	app.route('/register')
 		.get(registration.view)
-		.post(registration.submit);
+		.post(registration.validate, registration.submit);
 
 	// middle ware to authenticate user
 	// above are not restricted pages
 	app.use(sessionHandler.authenticationHandler);
 	// below are restricted pages
+	app.get('/updateUser', updateUser.view)
+
+	app.post('/password', updateUser.updatePassword);
+	app.post('/displayName', updateUser.updateDisplayName);
+
 	app.use(sessionHandler.userHandler);
 	app.get('/:index(index)?', index.index);
 

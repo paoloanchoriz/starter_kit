@@ -1,8 +1,14 @@
 var PasswordStore = require('../../models/passwordStore');
 var User = require('../../models/user');
 
-// TODO[PAO]: update routers to use PasswordStore instead of redis User and
-// mongoose schema User instead of MongoUser
+var handleErrors = function(res, errList) {
+	var errLength = errList.length;
+	for(var i = 0; i < errLength; i++) {
+		var error = errList[i];
+		res.error(error.msg);
+	}
+};
+
 exports.view = function(req, res) {
 	if(req.session.uid) res.redirect('/');
 	res.render('login', { title : 'Login Page' });
@@ -10,7 +16,9 @@ exports.view = function(req, res) {
 
 exports.submit = function(req, res, next) {
 	var user = req.body.user;
-	PasswordStore.authenticate(user, function(err, result) {
+	var email = user.email;
+	var password = user.password;
+	User.authenticate(password, email, function(err, result) {
 		if(err) return next(err);
 		if(!result) {
 			res.error('Invalid email or password');
@@ -25,7 +33,7 @@ exports.submit = function(req, res, next) {
 				res.redirect('back');
 				return;
 			}
-			
+
 			req.session.uid = user._id;
 			req.session.user = user;
 			res.redirect('/');
@@ -38,4 +46,16 @@ exports.logout = function(req, res) {
 		if(err) throw err;
 		res.redirect('/');
 	});
+};
+
+exports.validate = function(req, res, next) {
+	req.assert('user.email', 'Invalid username or password').isEmpty();
+	req.assert('user.login', 'Invalid username or password').isEmpty();
+
+	var errors = req.validationErrors();
+	if(errors) {
+		handleErrors(res, errors);
+		res.redirect('back');
+		return;
+	}
 };

@@ -1,6 +1,13 @@
-// var User = require('../../models/authentication/user');
 var User = require('../../models/user');
-var PasswordStore = require('../../models/passwordStore');
+var userValidator = require('../../validators/userValidator');
+
+var handleErrors = function(res, errList) {
+	var errLength = errList.length;
+	for(var i = 0; i < errLength; i++) {
+		var error = errList[i];
+		res.error(error.msg);
+	}
+};
 
 var saveUser = function(req, res, next) {
 	return function(formUser, err) {
@@ -25,21 +32,14 @@ var saveUser = function(req, res, next) {
 			lastName : formUser.lastName,
 			birthDate : new Date(formUser.birthDate),
 			email : formUser.email,
-			contactNumber : formUser.contactNumber
-		}).save(function(err, user) {
+			contactNumber : formUser.contactNumber,
+			password : formUser.password
+		}).saveCredentials(function(err, user) {
 			if(err) return next(err);
 			
-			var passwordStore = new PasswordStore({
-				id : user._id,
-				pass : formUser.pass,
-				email : user.email
-			});
-			
-			passwordStore.save(function(err) {
-				req.session.uid = user._id;
-				req.session.user = user;
-				res.redirect('/');
-			});
+			req.session.uid = user._id;
+			req.session.user = user;
+			res.redirect('/');
 		});
 	};
 };
@@ -53,4 +53,36 @@ exports.submit = function(req, res, next) {
 	// TODO[PAO]: validation goes here
 	// TODO[PAO]: move findByEmail to validation part
 	User.findByEmail(req.body.user.email, saveUser(req, res, next));
+};
+
+exports.validate = function(req, res, next) {
+	userValidator.firstName(req);
+	userValidator.lastName(req);
+	userValidator.birthDate(req);
+	userValidator.contactNumber(req);
+	userValidator.password(req);
+	userValidator.email(req);
+
+	var errors = req.validationErrors();
+	if(errors) {
+		handleErrors(res, errors);
+		res.redirect('back');
+		return;
+	}
+	
+	User.findByEmail(req.body.user.email, function(err, user) {
+		if(err) return next(err);
+
+		if(user) {
+			req.validationErrors.push({
+				param : 'user.email',
+				msg : 'already in use',
+				value : user.email
+			});
+			handleErrors(res, errors);
+			res.redirect('back');
+			return;
+		}
+		next();
+	});
 };

@@ -1,0 +1,8 @@
+{
+  "name": "starter_kit",
+  "version": "0.0.1",
+  "dependencies": {
+    "bootstrap": "~3.0.0"
+  },
+  "private": true
+}

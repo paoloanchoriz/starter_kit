@@ -6,8 +6,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var mongoose = require('mongoose');
+var expressValidator = require('express-validator');
 
+var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/starter_kit');
 
 var routes = require('./routes/init');
@@ -26,6 +27,26 @@ app.use(logger('dev'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
+
+// Move to another file
+app.use(expressValidator({
+    errorFormater : function(param, msg, value) {
+        var namespace = param.split('.'), 
+            root = namespace.shift(),
+            formParam = root;
+
+        while(namespace.length) {
+          formParam += '[' + namespace.shift() + ']';
+        }
+
+        return {
+          param : formParam,
+          msg   : msg,
+          value : value
+        };
+    }
+}));
+
 app.use(cookieParser());
 
 //TODO[PAO]: Will use redis connect in future implementation
@@ -37,6 +58,7 @@ app.use(session({
     })
 );
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/bower_components', express.static(__dirname, 'bower_components'));
 
 routes.initRouters(app);
 
