@@ -1,14 +1,6 @@
 var PasswordStore = require('../../models/passwordStore');
 var User = require('../../models/user');
 
-var handleErrors = function(res, errList) {
-	var errLength = errList.length;
-	for(var i = 0; i < errLength; i++) {
-		var error = errList[i];
-		res.error(error.msg);
-	}
-};
-
 exports.view = function(req, res) {
 	if(req.session.uid) res.redirect('/');
 	res.render('login', { title : 'Login Page' });
@@ -49,8 +41,8 @@ exports.logout = function(req, res) {
 };
 
 exports.validate = function(req, res, next) {
-	req.assert('user.email', 'Invalid username or password').isEmpty();
-	req.assert('user.login', 'Invalid username or password').isEmpty();
+	req.assert('user.email', 'Email is required').isEmpty();
+	req.assert('user.password', 'Password is required').isEmpty();
 
 	var errors = req.validationErrors();
 	if(errors) {

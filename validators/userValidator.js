@@ -9,44 +9,45 @@ var contactNumber = 'user.contactNumber';
 var password = 'user.password';
 
 var contactNumberPattern = /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{2,3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
+var birthDatePattern = /[0-9]{2}[a-z]{3}[0-9]{4}/i;
 
-var checkName = function(req, field) {
-	req.assert(field, 'required').notEmpty();
-	req.assert(field, 'at least 2 characters').len(2);
-	req.assert(field, 'should be alphanumeric').isAlphanumeric();
+var checkName = function(req, field. literalName) {
+	req.assert(field, literalName + ' is required').notEmpty();
+	req.assert(field, literalName + ' should have at least 2 characters').len(2);
+	req.assert(field, literalName + ' should be alphanumeric').isAlphanumeric();
 };
 
 exports.email = function(req) {
-	req.assert(emailField, 'required').notEmpty();
-	req.assert(emailField, 'invalid format').isEmail();
+	req.assert(emailField, 'Email is required').notEmpty();
+	req.assert(emailField, 'Email is in an invalid format').isEmail();
 };
 
 exports.firstName = function(req) {
-	checkName(req, firstName);
+	checkName(req, firstName, 'First Name');
 };
 
 exports.lastName = function(req) {
-	checkName(req, lastName);
+	checkName(req, lastName, 'Last Name');
 };
 
 exports.birthDate = function(req) {
-	req.assert(birthDate, 'required').notEmpty();
-	req.assert(birthDate, 'should be 9 characters').len(9,9);
-	req.assert(birthDate, 'DDMMMYYYY format')
-		.matches(/[0-9]{2}[a-z]{3}[0-9]{4}/i);
+	req.assert(birthDate, 'BirthDate is required').notEmpty();
+	req.assert(birthDate, 'BirthDate should be at least 9 characters').len(9,9);
+	req.assert(birthDate, 'BirthDate should be DDMMMYYYY format')
+		.matches(birthDatePattern);
 };
 
 exports.contactNumber = function(req) {
-	req.assert(contactNumber, 'required').notEmpty();
-	req.assert(contactNumber, 'invalid contact number')
+	req.assert(contactNumber, 'Contact Number is required').notEmpty();
+	req.assert(contactNumber, 'Contact Number is invalid contact number')
 		.matches(contactNumberPattern);
 };
 
 exports.password = function(req) {
-	req.assert(password, 'required').notEmpty();
-	req.assert(password, 'at least 8 characters long').len(8);
+	req.assert(password, 'Password is required').notEmpty();
+	req.assert(password, 'Password should be at least 8 characters long').len(8);
 };
 
 exports.displayName = function(req) {
-	checkName(req, displayName);
+	checkName(req, displayName, 'Display Name');
 };
