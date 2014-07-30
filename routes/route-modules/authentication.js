@@ -1,28 +1,42 @@
 var PasswordStore = require('../../models/passwordStore');
 var User = require('../../models/user');
 
+var title = 'Login Page';
+var viewName = 'login';
+
+var renderPage = function(req, res, errors) {
+	delete req.body.user.password;
+	var renderObject = req.createFormObject('user');
+	res.renderObjectError(viewName, title, renderObject, errors);
+};
+
+var renderError = function(req, res, errorMessage) {
+	var errors = req.addValidationErrors('user[email]', 
+		errorMessage, req.body.user.email);
+	console.log(errors);
+	renderPage(req, res, errors);
+};
+
 exports.view = function(req, res) {
 	if(req.session.uid) res.redirect('/');
-	res.render('login', { title : 'Login Page' });
+	res.renderPage(viewName, title);
 };
 
 exports.submit = function(req, res, next) {
 	var user = req.body.user;
 	var email = user.email;
 	var password = user.password;
+	console.log('authenticating');
 	User.authenticate(password, email, function(err, result) {
 		if(err) return next(err);
 		if(!result) {
-			res.error('Invalid email or password');
-			res.redirect('back');
+			renderError(req, res, 'Invalid email or password');
 			return;
 		}
-
 		User.findByEmail(user.email, function(err, user) {
 			if(err) return next(err);
 			if(!user) {
-				res.error('User does not exist in our records');
-				res.redirect('back');
+				renderError(req, res, 'User does not exist in our records.');
 				return;
 			}
 
@@ -41,13 +55,13 @@ exports.logout = function(req, res) {
 };
 
 exports.validate = function(req, res, next) {
-	req.assert('user.email', 'Email is required').isEmpty();
-	req.assert('user.password', 'Password is required').isEmpty();
+	req.assert('user.email', 'Email is required').notEmpty();
+	req.assert('user.password', 'Password is required').notEmpty();
 
 	var errors = req.validationErrors();
 	if(errors) {
-		handleErrors(res, errors);
-		res.redirect('back');
+		renderPage(req, res, errors);
 		return;
 	}
+	next();
 };

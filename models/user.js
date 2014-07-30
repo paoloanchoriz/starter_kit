@@ -40,7 +40,7 @@ var updateById = function(that, id, updateValue, cb) {
 
 // Hashes the password before saving
 User.methods.saveCredentials = function(cb) {
-	hashPassword(this.password);
+	this.password = hashPassword(this.password);
 	this.save(function(err, user) {
 		user = user.toObject();
 		deletePassword(user, err, cb);
@@ -68,14 +68,21 @@ User.statics.findByEmail = function(email, cb) {
 User.statics.authenticate = function(password, email, cb) {
 	this.findOne({ email : email }, { password : 1, _id : 0 }, 
 		{ lean : true }, function(err, user) {
-		if(err) return fn()
+		if(err) return cb(err)
 		bcrypt.compare(password, user.password, function(err, result) {
-			if(err) cb(err);
 			return cb(err, result);
 		})
 	});
 };
 
+User.statics.matchPassword = function(id, password, cb) {
+	this.findById(id, { password : 1, _id: 0}, function(err, user) {
+		if(err) return cb(err);
+		bcrypt.compare(password, user.password, function(err, result) {
+			return cb(err, result);
+		});
+	})
+}
 // TODO[PAO]: Search functions that uses first name, 
 // last name and display name?
 // Future implementation

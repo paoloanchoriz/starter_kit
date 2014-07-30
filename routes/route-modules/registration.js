@@ -1,20 +1,17 @@
 var User = require('../../models/user');
 var userValidator = require('../../validators/userValidator');
 
-var getRenderObject = function(err, user) {
-	return {
-		view : 'register',
-		content: {
-			user : user,
-			errors : err,
-			title : 'Register'
-		}
-	};
+var title = 'Register';
+var viewName = 'register';
+
+var renderPage = function(req, res, errors) {
+	delete req.body.user.password;
+	res.renderObjectError(viewName, title, req.createFormObject('user'), errors);
 };
 
 exports.view = function(req, res) {
 	if(req.session.uid) res.redirect('/');
-	res.render('register', { title : 'Register' });
+	res.renderPage(viewName, title);
 };
 
 exports.submit = function(req, res, next) {
@@ -42,12 +39,6 @@ exports.submit = function(req, res, next) {
 	});
 };
 
-var renderPage = function(res, user, err) {
-	var renderObject = getRenderObject(err, user);
-	res.render(renderObject.view, renderObject.content);
-};
-
-// TODO: redirect validations to proper pages with error messages and model
 exports.validate = function(req, res, next) {
 	var user = req.body.user.email;
 
@@ -60,7 +51,7 @@ exports.validate = function(req, res, next) {
 
 	var errors = req.validationErrors();
 	if(errors) {
-		renderPage(res, user, errors);
+		renderPage(req, res, errors);
 		return;
 	}
 	
@@ -69,10 +60,9 @@ exports.validate = function(req, res, next) {
 		if(err) return next(err);
 
 		if(user) {
-			renderPage(res, user, 
-					req.addValidationErrors('user[email]', 
-						'Email is already in use.', email)
-				);
+			errors = req.addValidationErrors('user[email]', 
+						'Email is already in use.', email);
+			renderPage(req, res, errors);
 			return;
 		}
 		next();

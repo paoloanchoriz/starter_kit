@@ -11,7 +11,7 @@ var password = 'user.password';
 var contactNumberPattern = /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{2,3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
 var birthDatePattern = /[0-9]{2}[a-z]{3}[0-9]{4}/i;
 
-var checkName = function(req, field. literalName) {
+var checkName = function(req, field, literalName) {
 	req.assert(field, literalName + ' is required').notEmpty();
 	req.assert(field, literalName + ' should have at least 2 characters').len(2);
 	req.assert(field, literalName + ' should be alphanumeric').isAlphanumeric();
@@ -19,7 +19,7 @@ var checkName = function(req, field. literalName) {
 
 exports.email = function(req) {
 	req.assert(emailField, 'Email is required').notEmpty();
-	req.assert(emailField, 'Email is in an invalid format').isEmail();
+	req.assert(emailField, 'Invalid email format').isEmail();
 };
 
 exports.firstName = function(req) {
